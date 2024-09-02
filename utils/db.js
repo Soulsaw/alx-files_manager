@@ -23,14 +23,14 @@ class DBClient {
     await this.client.connect();
     const db = this.client.db(DB_DATABASE);
     const collection = db.collection('users');
-    return collection;
+    return collection.lenght();
   }
 
   async nbFiles() {
     await this.client.connect();
     const db = this.client.db(DB_DATABASE);
     const collection = db.collection('files');
-    return collection;
+    return collection.lenght();
   }
 }
 const dbClient = new DBClient();
