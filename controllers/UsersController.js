@@ -19,9 +19,8 @@ exports.postNew = async (req, res) => {
       res.status(400).json({ error: 'Already exist' });
     } else {
       const hashPassword = crypto.createHash('sha1').update(password).digest('hex');
-      const insertUser = await collection.insert({ email, password: hashPassword });
-      const result = insertUser.ops[0];
-      res.status(201).json({ id: result._id, email: result.email });
+      const result = await collection.insertOne({ email, password: hashPassword });
+      res.status(201).json({ id: result.insertId, email: result.email });
     }
   }
 };
