@@ -7,10 +7,7 @@ const uri = `mongodb://${DB_HOST}:${DB_PORT}`;
 
 class DBClient {
   constructor() {
-    this.client = MongoClient(uri, {
-      useUnifiedTopology: true,
-      useNewUrlParser: true,
-    });
+    this.client = MongoClient(uri);
     this.dbName = DB_DATABASE;
     this.db = null;
   }
