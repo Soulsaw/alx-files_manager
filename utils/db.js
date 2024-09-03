@@ -1,36 +1,48 @@
 const { MongoClient } = require('mongodb');
 
-const DB_HOST = process.env.DB_HOST !== undefined ? process.env.DB_HOST : 'localhost';
-const DB_PORT = process.env.DB_PORT !== undefined ? process.env.DB_PORT : '27017';
-const DB_DATABASE = process.env.DB_DATABASE !== undefined ? process.env.DB_DATABASE : 'files_manager';
-const url = `mongodb://${DB_HOST}:${DB_PORT}`;
+const DB_HOST = process.env.DB_HOST || 'localhost';
+const DB_PORT = process.env.DB_PORT || '27017';
+const DB_DATABASE = process.env.DB_DATABASE || 'files_manager';
+const uri = `mongodb://${DB_HOST}:${DB_PORT}`;
 
 class DBClient {
   constructor() {
-    this.client = MongoClient(url);
+    this.client = MongoClient(uri, {
+      useUnifiedTopology: true,
+      useNewUrlParser: true,
+    });
+    this.dbName = DB_DATABASE;
+    this.db = null;
   }
 
   isAlive() {
     try {
       this.client.connect();
+      this.db = this.client.db(this.dbName);
       return true;
-    } catch (err) {
+    } catch (error) {
       return false;
     }
   }
 
   async nbUsers() {
-    await this.client.connect();
-    const db = this.client.db(DB_DATABASE);
-    const collection = db.collection('users');
-    return collection.length;
+    try {
+      const count = await this.db.collection('users').countDocuments();
+      return count;
+    } catch (error) {
+      console.error('Failed to get number of users', error);
+      throw error;
+    }
   }
 
   async nbFiles() {
-    await this.client.connect();
-    const db = this.client.db(DB_DATABASE);
-    const collection = db.collection('files');
-    return collection.length;
+    try {
+      const count = await this.db.collection('files').countDocuments();
+      return count;
+    } catch (error) {
+      console.error('Failed to get number of users', error);
+      throw error;
+    }
   }
 }
 const dbClient = new DBClient();
