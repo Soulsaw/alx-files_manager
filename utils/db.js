@@ -7,7 +7,9 @@ const uri = `mongodb://${DB_HOST}:${DB_PORT}`;
 
 class DBClient {
   constructor() {
-    this.client = MongoClient(uri);
+    this.client = MongoClient(uri, {
+      useUnifiedTopology: true,
+    });
     this.dbName = DB_DATABASE;
     this.db = null;
   }
@@ -24,6 +26,9 @@ class DBClient {
   }
 
   async nbUsers() {
+    if (!this.isAlive()) {
+      throw new Error('Error database not connected');
+    }
     try {
       const count = await this.db.collection('users').countDocuments();
       return count;
@@ -34,6 +39,9 @@ class DBClient {
   }
 
   async nbFiles() {
+    if (!this.isAlive()) {
+      throw new Error('Failed to connect to database');
+    }
     try {
       const count = await this.db.collection('files').countDocuments();
       return count;
