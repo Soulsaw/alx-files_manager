@@ -27,9 +27,7 @@ exports.postUpload = async (req, res) => {
       if (!data && type !== 'folder') {
         res.status(400).json({ error: 'Missing data' });
       }
-      if (!isPublic) {
-        isPublic = false;
-      }
+      if (!isPublic) isPublic = false;
       if (!dbClient.isAlive()) {
         res.status(400).json({ error: 'Database not connected' });
       }
