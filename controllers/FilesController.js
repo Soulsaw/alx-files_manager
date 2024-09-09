@@ -24,7 +24,9 @@ exports.postUpload = async (req, res) => {
     return res.status(401).json({ error: 'Unauthorized' });
   }
   if (!name) return res.status(400).json({ error: 'Missing name' });
-  if (!type || !authTypes.includes(type)) return res.status(400).json({ error: 'Missing type' });
+  if (!type || !authTypes.includes(type)) {
+    return res.status(400).json({ error: 'Missing type' });
+  }
   if (!data && type !== 'folder') {
     return res.status(400).json({ error: 'Missing data' });
   }
@@ -146,5 +148,14 @@ exports.getIndex = async (req, res) => {
       .find({ userId: ObjectId(user._id) })
       .toArray();
   }
-  return res.json(files);
+  return res.json(
+    files.map((file) => ({
+      id: file._id,
+      userId: file.userId,
+      name: file.name,
+      type: file.type,
+      isPublic: file.isPublic,
+      parentId: file.parentId,
+    })),
+  );
 };
