@@ -9,6 +9,7 @@ exports.postUpload = async (req, res) => {
   const token = req.headers['x-token'];
   const { name, type, data } = req.body;
   const { isPublic = false, parentId = 0 } = req.body;
+  const authTypes = ['file', 'folder', 'image'];
   const key = `auth_${token}`;
   const userId = await redisClient.get(key);
   if (!userId) {
@@ -23,7 +24,7 @@ exports.postUpload = async (req, res) => {
     return res.status(401).json({ error: 'Unauthorized' });
   }
   if (!name) return res.status(400).json({ error: 'Missing name' });
-  if (!type) return res.status(400).json({ error: 'Missing type' });
+  if (!type || !authTypes.includes(type)) return res.status(400).json({ error: 'Missing type' });
   if (!data && type !== 'folder') {
     return res.status(400).json({ error: 'Missing data' });
   }
