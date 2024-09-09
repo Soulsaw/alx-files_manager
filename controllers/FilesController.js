@@ -128,7 +128,7 @@ exports.getShow = async (req, res) => {
 
 exports.getIndex = async (req, res) => {
   const token = req.headers['x-token'];
-  const { parentId } = req.query;
+  const { parentId = 0 } = req.query;
   const userId = await redisClient.get(`auth_${token}`);
   if (!userId) return res.status(401).json({ error: 'Unauthorized' });
   if (!dbClient.isAlive()) {
