@@ -1,5 +1,6 @@
 const express = require('express');
 const router = require('./routes/index');
+/* Implenting the express server handle */
 
 const app = express();
 const port = process.env.PORT || 5000;

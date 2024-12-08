@@ -1,4 +1,5 @@
 import { createClient } from 'redis';
+/* This file define a class that create a redisclient */
 
 class RedisClient {
   constructor() {

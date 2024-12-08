@@ -1,5 +1,6 @@
 import dbClient from '../utils/db';
 import redisClient from '../utils/redis';
+/* The files controller */
 
 const { ObjectId } = require('mongodb');
 const uuid = require('uuid');

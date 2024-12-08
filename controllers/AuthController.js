@@ -1,5 +1,6 @@
 import dbClient from '../utils/db';
 import redisClient from '../utils/redis';
+/* The auth controller */
 
 const crypto = require('crypto');
 const uuid = require('uuid');
