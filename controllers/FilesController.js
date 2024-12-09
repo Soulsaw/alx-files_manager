@@ -36,7 +36,7 @@ exports.postUpload = async (req, res) => {
   }
   const collectionF = dbClient.db.collection('files');
   if (parentId !== 0) {
-    const file = await collectionF.findOne({ parentId });
+    const file = await collectionF.findOne({  _id: ObjectId(parentId) });
     if (!file) return res.status(400).json({ error: 'Parent not found' });
     if (file && file.type !== 'folder') {
       return res.status(400).json({ error: 'Parent is not a folder' });
