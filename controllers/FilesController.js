@@ -176,3 +176,59 @@ exports.getIndex = async (req, res) => {
     })),
   );
 };
+
+exports.putPublish = async (req, res) => {
+  const token = req.headers['x-token'];
+  const userId = await redisClient.get(`auth_${token}`);
+  const { id } = req.query;
+  if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+  if (!dbClient.isAlive()) {
+    return res.status(401).json({ error: 'Database not connected' });
+  }
+  const usersCollection = dbClient.db.collection('users');
+  const user = await usersCollection.findOne({ _id: ObjectId(userId) });
+  if (!user) return res.status(401).json({ error: 'Unauthorized' });
+  const filesCollection = dbClient.db.collections('files');
+
+  const updateFile = await filesCollection.updateOne(
+    { _id: ObjectId(id), userId: ObjectId(user._id) },
+    { $set: { isPublic: true } },
+  );
+  if (!updateFile) return res.status(404).json({ error: 'Not found' });
+  return res.status(200).json({
+    id: updateFile._id,
+    userId: updateFile.userId,
+    name: updateFile.name,
+    type: updateFile.type,
+    isPublic: updateFile.isPublic,
+    parentId: updateFile.parentId,
+  });
+};
+
+exports.putUnpublish = async (req, res) => {
+  const token = req.headers['x-token'];
+  const userId = await redisClient.get(`auth_${token}`);
+  const { id } = req.query;
+  if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+  if (!dbClient.isAlive()) {
+    return res.status(401).json({ error: 'Database not connected' });
+  }
+  const usersCollection = dbClient.db.collection('users');
+  const user = await usersCollection.findOne({ _id: ObjectId(userId) });
+  if (!user) return res.status(401).json({ error: 'Unauthorized' });
+  const filesCollection = dbClient.db.collections('files');
+
+  const updateFile = await filesCollection.updateOne(
+    { _id: ObjectId(id), userId: ObjectId(user._id) },
+    { $set: { isPublic: false } },
+  );
+  if (!updateFile) return res.status(404).json({ error: 'Not found' });
+  return res.status(200).json({
+    id: updateFile._id,
+    userId: updateFile.userId,
+    name: updateFile.name,
+    type: updateFile.type,
+    isPublic: updateFile.isPublic,
+    parentId: updateFile.parentId,
+  });
+};
