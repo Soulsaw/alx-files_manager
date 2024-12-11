@@ -130,6 +130,7 @@ exports.getShow = async (req, res) => {
 exports.getIndex = async (req, res) => {
   const token = req.headers['x-token'];
   const { parentId = 0 } = req.query;
+  const page = parseInt(req.query.page, 10) || 0;
   const userId = await redisClient.get(`auth_${token}`);
   if (!userId) return res.status(401).json({ error: 'Unauthorized' });
   if (!dbClient.isAlive()) {
@@ -138,15 +139,30 @@ exports.getIndex = async (req, res) => {
   const usersCollection = dbClient.db.collection('users');
   const user = await usersCollection.findOne({ _id: ObjectId(userId) });
   if (!user) return res.status(401).json({ error: 'Unauthorized' });
-  const filesCollection = dbClient.db.collection('files');
   let files;
-  if (parentId) {
-    files = await filesCollection
-      .find({ userId: ObjectId(user._id), parentId })
+  if (parentId === 0 && page === 0) {
+    files = await dbClient.db
+      .collection('files')
+      .aggregate([
+        {
+          $match: { userId: ObjectId(user._id) },
+        },
+      ])
       .toArray();
   } else {
-    files = await filesCollection
-      .find({ userId: ObjectId(user._id) })
+    files = await dbClient.db
+      .collection('files')
+      .aggregate([
+        {
+          $match: { userId: ObjectId(user._id), parentId },
+        },
+        {
+          $skip: page * 20,
+        },
+        {
+          $limit: 20,
+        },
+      ])
       .toArray();
   }
   return res.json(
